@@ -129,7 +129,6 @@ def check_auth():
 
 @app.route("/health")
 def health():
-    ensure_init()
     return jsonify({"ok": True, "time": str(__import__("datetime").datetime.now())})
 
 @app.route("/api/produk")
