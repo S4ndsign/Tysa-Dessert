@@ -15,7 +15,8 @@ DB_CONFIG = {
     "database": os.getenv("DB_NAME", "tysa_dessert"),
     "cursorclass": pymysql.cursors.DictCursor,
     "autocommit": False,
-    "charset": "utf8mb4"
+    "charset": "utf8mb4",
+    "connect_timeout": 5
 }
 
 app = Flask(__name__, static_folder="../")
@@ -81,10 +82,16 @@ def init_db():
     except Exception as e:
         print("DB init gagal:", e)
 
-# init saat import (untuk gunicorn) dan saat run langsung
-try:
-    init_db()
-except: pass
+# JANGAN auto init saat import (bisa bikin gunicorn timeout di Railway jika MySQL belum ready)
+# init akan dipanggil lazy saat /health atau /api/produk pertama kali
+_inited = False
+def ensure_init():
+    global _inited
+    if not _inited:
+        try:
+            init_db()
+        except: pass
+        _inited = True
 
 def require_auth(f):
     @wraps(f)
@@ -122,10 +129,12 @@ def check_auth():
 
 @app.route("/health")
 def health():
+    ensure_init()
     return jsonify({"ok": True, "time": str(__import__("datetime").datetime.now())})
 
 @app.route("/api/produk")
 def api_produk():
+    ensure_init()
     try:
         conn = get_db()
         with conn.cursor() as cur:
