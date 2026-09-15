@@ -1,1 +1,1 @@
-web: gunicorn --chdir backend app:app --bind 0.0.0.0:$PORT --workers 2
+web: bash -c "gunicorn --chdir backend app:app --bind 0.0.0.0:\$PORT --workers 2"
