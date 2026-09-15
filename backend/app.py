@@ -120,16 +120,21 @@ def check_auth():
     token = auth.replace("Bearer ", "").strip()
     return jsonify({"ok": token in tokens})
 
+@app.route("/health")
+def health():
+    return jsonify({"ok": True, "time": str(__import__("datetime").datetime.now())})
+
 @app.route("/api/produk")
 def api_produk():
-    conn = get_db()
     try:
+        conn = get_db()
         with conn.cursor() as cur:
             cur.execute("SELECT * FROM produk WHERE aktif=1")
             rows = cur.fetchall()
-    finally:
         conn.close()
-    return jsonify(rows)
+        return jsonify(rows)
+    except Exception as e:
+        return jsonify({"error": str(e), "hint": "cek DB_HOST/DB_PASS di Railway Variables"}), 500
 
 @app.route("/api/pesanan", methods=["GET", "POST"])
 def api_pesanan():
