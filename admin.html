@@ -1,0 +1,272 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Admin - Tysa Dessert Rekap Laporan</title>
+<script src="https://cdn.tailwindcss.com"></script>
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+<script>tailwind.config={theme:{extend:{colors:{primary:'#E8437A',secondary:'#5B1A3A',cream:'#FFF5F8'}}}}</script>
+<style>body{font-family:'Poppins',sans-serif} @media print { #loginOverlay, nav, #noPrint { display:none !important } }</style>
+<!-- jsPDF untuk cetak PDF -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.8.2/jspdf.plugin.autotable.min.js"></script>
+</head>
+<body class="bg-cream min-h-screen">
+
+<!-- LOGIN OVERLAY -->
+<div id="loginOverlay" class="fixed inset-0 bg-secondary/90 backdrop-blur flex items-center justify-center z-50">
+  <div class="bg-white p-8 rounded-3xl shadow-2xl w-full max-w-sm mx-4">
+    <div class="text-center mb-6">
+      <div class="w-14 h-14 bg-primary rounded-2xl flex items-center justify-center text-white text-2xl mx-auto"><i class="fa-solid fa-lock"></i></div>
+      <h2 class="font-bold text-xl text-secondary mt-3">Login Admin</h2>
+      <p class="text-xs text-gray-500">Tysa Dessert • Akses laporan & cetak PDF</p>
+    </div>
+    <div class="space-y-3">
+      <input id="loginUser" placeholder="Username" value="admin" class="w-full border rounded-xl px-4 py-2.5 text-sm">
+      <input id="loginPass" type="password" placeholder="Password" value="tysa123" class="w-full border rounded-xl px-4 py-2.5 text-sm">
+      <button onclick="doLogin()" class="w-full bg-primary text-white py-2.5 rounded-xl font-semibold hover:bg-pink-600">Masuk</button>
+      <p id="loginMsg" class="text-xs text-red-500 text-center"></p>
+      <p class="text-xs text-center text-gray-400">Default: <b>admin / tysa123</b> • ganti di backend/app.py</p>
+    </div>
+  </div>
+</div>
+
+<nav class="bg-white shadow-sm sticky top-0 z-10">
+  <div class="max-w-6xl mx-auto px-4 py-3 flex justify-between items-center">
+    <a href="/" class="font-bold text-secondary"><i class="fa-solid fa-ice-cream text-primary mr-2"></i>Tysa Dessert <span class="text-xs bg-pink-100 text-primary px-2 py-0.5 rounded-full">ADMIN</span></a>
+    <div class="flex gap-2 items-center">
+      <a href="/" class="text-sm border px-3 py-1.5 rounded-full">← Landing Page</a>
+      <button onclick="doLogout()" class="text-sm bg-gray-800 text-white px-3 py-1.5 rounded-full"><i class="fa-solid fa-right-from-bracket mr-1"></i> Logout</button>
+    </div>
+  </div>
+</nav>
+
+<div class="max-w-6xl mx-auto px-4 py-6" id="mainContent">
+  <!-- RINGKASAN -->
+  <div class="grid md:grid-cols-3 gap-4 mb-6">
+    <div class="bg-white p-5 rounded-2xl shadow-sm">
+      <p class="text-xs text-gray-500">HARI INI</p>
+      <p class="text-2xl font-bold text-secondary" id="rHari">-</p>
+      <p class="text-xs text-gray-500" id="rHariOmzet">-</p>
+    </div>
+    <div class="bg-white p-5 rounded-2xl shadow-sm">
+      <p class="text-xs text-gray-500">BULAN INI</p>
+      <p class="text-2xl font-bold text-secondary" id="rBulan">-</p>
+      <p class="text-xs text-gray-500" id="rBulanOmzet">-</p>
+    </div>
+    <div class="bg-white p-5 rounded-2xl shadow-sm">
+      <p class="text-xs text-gray-500">TAHUN INI</p>
+      <p class="text-2xl font-bold text-secondary" id="rTahun">-</p>
+      <p class="text-xs text-gray-500" id="rTahunOmzet">-</p>
+    </div>
+  </div>
+
+  <!-- FORM TAMBAH PESANAN MANUAL -->
+  <div class="bg-white p-5 rounded-2xl shadow-sm mb-6" id="noPrint">
+    <h3 class="font-bold text-secondary mb-3"><i class="fa-solid fa-plus mr-1 text-primary"></i> Input Pesanan Manual</h3>
+    <div class="grid md:grid-cols-4 gap-3">
+      <input id="fNama" placeholder="Nama pelanggan" class="border rounded-lg px-3 py-2 text-sm">
+      <input id="fHp" placeholder="HP" class="border rounded-lg px-3 py-2 text-sm">
+      <input id="fAlamat" placeholder="Alamat" class="border rounded-lg px-3 py-2 text-sm">
+      <select id="fMetode" class="border rounded-lg px-3 py-2 text-sm"><option>COD</option><option>Transfer</option><option>QRIS</option></select>
+    </div>
+    <div id="formItems" class="mt-3 space-y-2"></div>
+    <div class="flex gap-2 mt-3">
+      <button onclick="addFormItem()" class="border px-3 py-1.5 rounded-full text-sm">+ Item</button>
+      <button onclick="submitPesanan()" class="bg-primary text-white px-5 py-1.5 rounded-full text-sm font-semibold">Simpan Pesanan</button>
+      <span id="formMsg" class="text-sm ml-2"></span>
+    </div>
+  </div>
+
+  <!-- FILTER & TABS -->
+  <div class="bg-white p-5 rounded-2xl shadow-sm mb-6">
+    <div class="flex flex-wrap gap-2 mb-4">
+      <button onclick="showTab('harian')" id="tabHarian" class="bg-secondary text-white px-4 py-2 rounded-full text-sm">Harian</button>
+      <button onclick="showTab('bulanan')" id="tabBulanan" class="bg-white border px-4 py-2 rounded-full text-sm">Bulanan</button>
+      <button onclick="showTab('tahunan')" id="tabTahunan" class="bg-white border px-4 py-2 rounded-full text-sm">Tahunan</button>
+      <button onclick="showTab('produk')" id="tabProduk" class="bg-white border px-4 py-2 rounded-full text-sm">Produk Terlaris</button>
+      <button onclick="showTab('pesanan')" id="tabPesanan" class="bg-white border px-4 py-2 rounded-full text-sm">Daftar Pesanan</button>
+    </div>
+
+    <div class="flex gap-2 mb-3 text-sm flex-wrap items-center" id="noPrint">
+      <input type="date" id="filterFrom" class="border rounded-lg px-3 py-1.5">
+      <input type="date" id="filterTo" class="border rounded-lg px-3 py-1.5">
+      <button onclick="loadAll()" class="bg-gray-800 text-white px-4 py-1.5 rounded-full">Filter</button>
+      <button onclick="exportCSV()" class="border px-4 py-1.5 rounded-full"><i class="fa-solid fa-file-csv mr-1"></i> CSV</button>
+      <button onclick="cetakPDF()" class="bg-primary text-white px-4 py-1.5 rounded-full"><i class="fa-solid fa-file-pdf mr-1"></i> Cetak PDF</button>
+      <button onclick="window.print()" class="border px-4 py-1.5 rounded-full"><i class="fa-solid fa-print mr-1"></i> Print</button>
+    </div>
+
+    <div class="overflow-auto">
+      <table class="w-full text-sm" id="tabelLaporan">
+        <thead class="bg-gray-50 text-xs text-gray-500"><tr id="theadRow"></tr></thead>
+        <tbody id="tbodyRow" class="divide-y"></tbody>
+      </table>
+    </div>
+    <p class="text-xs text-gray-400 mt-3 text-center">Tysa Dessert • Laporan dicetak pada <span id="printDate"></span></p>
+  </div>
+
+  <div class="text-xs text-gray-500 bg-white p-4 rounded-2xl" id="noPrint">
+    <p class="font-semibold mb-1">Tips:</p>
+    <ul class="list-disc ml-5 space-y-1">
+      <li>Login default <code>admin / tysa123</code> — ubah di <code>backend/app.py</code> (ADMIN_USER / ADMIN_PASS)</li>
+      <li>Cetak PDF akan download file <code>laporan-tysa-*.pdf</code> dengan kop & tabel sesuai tab aktif</li>
+      <li>Data tersimpan di <code>database/tysa.db</code> — backup cukup copy file tersebut</li>
+    </ul>
+  </div>
+</div>
+
+<script>
+let produkList=[];
+let currentTab='harian';
+let lastData=[];
+let lastThead=[];
+
+function formatRp(n){ return 'Rp ' + Number(n||0).toLocaleString('id-ID'); }
+function authHeader(){ const t=localStorage.getItem('tysa_token'); return t ? {'Authorization':'Bearer '+t} : {}; }
+
+async function doLogin(){
+  const username=document.getElementById('loginUser').value;
+  const password=document.getElementById('loginPass').value;
+  const r=await fetch('/api/login',{method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify({username,password})});
+  const j=await r.json();
+  if(j.ok){ localStorage.setItem('tysa_token', j.token); document.getElementById('loginOverlay').style.display='none'; loadProduk().then(loadAll); }
+  else document.getElementById('loginMsg').textContent=j.error||'Gagal login';
+}
+function doLogout(){
+  const t=localStorage.getItem('tysa_token');
+  fetch('/api/logout',{method:'POST', headers:{'Authorization':'Bearer '+(t||'')}});
+  localStorage.removeItem('tysa_token'); location.reload();
+}
+async function checkLogin(){
+  const t=localStorage.getItem('tysa_token');
+  if(!t) return false;
+  const r=await fetch('/api/check-auth',{headers:{'Authorization':'Bearer '+t}});
+  const j=await r.json(); return j.ok;
+}
+async function ensureLogin(){
+  const ok=await checkLogin();
+  if(ok){ document.getElementById('loginOverlay').style.display='none'; loadProduk().then(loadAll); }
+  else document.getElementById('loginOverlay').style.display='flex';
+}
+document.getElementById('loginPass').addEventListener('keydown',e=>{ if(e.key==='Enter') doLogin(); });
+
+async function loadProduk(){
+  const r=await fetch('/api/produk'); produkList=await r.json();
+  document.getElementById('formItems').innerHTML='';
+  addFormItem(); addFormItem();
+}
+function addFormItem(){
+  const div=document.createElement('div');
+  div.className='flex gap-2';
+  div.innerHTML=`
+    <select class="border rounded-lg px-2 py-1.5 text-sm flex-1 prodSel">${produkList.map(p=>`<option value="${p.id}">${p.nama} - ${formatRp(p.harga)}</option>`).join('')}</select>
+    <input type="number" min="1" value="1" class="border rounded-lg px-2 py-1.5 text-sm w-20 qtyIn">
+    <button onclick="this.parentElement.remove()" class="text-red-500 px-2">×</button>
+  `;
+  document.getElementById('formItems').appendChild(div);
+}
+async function submitPesanan(){
+  const nama=document.getElementById('fNama').value.trim();
+  const hp=document.getElementById('fHp').value.trim();
+  const alamat=document.getElementById('fAlamat').value.trim();
+  const metode=document.getElementById('fMetode').value;
+  const items=[...document.querySelectorAll('#formItems > div')].map(d=>{
+    const sel=d.querySelector('select'); const qty=d.querySelector('.qtyIn').value;
+    return {produk_id: parseInt(sel.value), qty: parseInt(qty)};
+  }).filter(x=>x.qty>0);
+  if(!nama || items.length===0){ document.getElementById('formMsg').textContent='Isi nama & minimal 1 item'; return; }
+  const r=await fetch('/api/pesanan',{method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify({nama,hp,alamat,items,metode_bayar:metode})});
+  const j=await r.json();
+  document.getElementById('formMsg').textContent = j.ok ? `Tersimpan! ID #${j.pesanan_id} Total ${formatRp(j.total)}` : (j.error||'Gagal');
+  if(j.ok) loadAll();
+}
+async function loadRingkas(){
+  const r=await fetch('/api/laporan/ringkas',{headers:authHeader()}); 
+  if(r.status===401){ doLogout(); return; }
+  const j=await r.json();
+  document.getElementById('rHari').textContent = j.hari_ini.j + ' pesanan';
+  document.getElementById('rHariOmzet').textContent = formatRp(j.hari_ini.omzet);
+  document.getElementById('rBulan').textContent = j.bulan_ini.j + ' pesanan';
+  document.getElementById('rBulanOmzet').textContent = formatRp(j.bulan_ini.omzet);
+  document.getElementById('rTahun').textContent = j.tahun_ini.j + ' pesanan';
+  document.getElementById('rTahunOmzet').textContent = formatRp(j.tahun_ini.omzet);
+}
+function showTab(t){
+  currentTab=t;
+  document.querySelectorAll('[id^=tab]').forEach(b=>{b.className='bg-white border px-4 py-2 rounded-full text-sm'});
+  document.getElementById('tab'+t.charAt(0).toUpperCase()+t.slice(1)).className='bg-secondary text-white px-4 py-2 rounded-full text-sm';
+  loadAll();
+}
+async function loadAll(){
+  await loadRingkas();
+  const from=document.getElementById('filterFrom').value;
+  const to=document.getElementById('filterTo').value;
+  let url='', thead=[];
+  if(currentTab==='harian'){ url=`/api/laporan/harian?from=${from}&to=${to}`; thead=['Tanggal','Jumlah Pesanan','Omzet']; }
+  else if(currentTab==='bulanan'){ url=`/api/laporan/bulanan`; thead=['Bulan','Jumlah Pesanan','Omzet']; }
+  else if(currentTab==='tahunan'){ url=`/api/laporan/tahunan`; thead=['Tahun','Jumlah Pesanan','Omzet']; }
+  else if(currentTab==='produk'){ url=`/api/laporan/produk?from=${from}&to=${to}`; thead=['Produk','Kategori','Qty Terjual','Omzet']; }
+  else if(currentTab==='pesanan'){ url=`/api/pesanan`; thead=['ID','Tanggal','Pelanggan','HP','Total','Status','Items']; }
+  lastThead=thead;
+  const r=await fetch(url,{headers:authHeader()});
+  if(r.status===401){ doLogout(); return; }
+  const data=await r.json(); lastData=data;
+  document.getElementById('theadRow').innerHTML = thead.map(h=>`<th class="text-left px-3 py-2">${h}</th>`).join('');
+  const tbody=document.getElementById('tbodyRow');
+  document.getElementById('printDate').textContent=new Date().toLocaleString('id-ID');
+  if(data.length===0){ tbody.innerHTML='<tr><td colspan="7" class="px-3 py-6 text-center text-gray-400">Belum ada data</td></tr>'; return; }
+  if(currentTab==='harian'){
+    tbody.innerHTML=data.map(d=>`<tr><td class="px-3 py-2">${d.tanggal}</td><td class="px-3 py-2">${d.jumlah_pesanan}</td><td class="px-3 py-2 font-semibold text-primary">${formatRp(d.omzet)}</td></tr>`).join('');
+  } else if(currentTab==='bulanan'){
+    tbody.innerHTML=data.map(d=>`<tr><td class="px-3 py-2">${d.bulan}</td><td class="px-3 py-2">${d.jumlah_pesanan}</td><td class="px-3 py-2 font-semibold text-primary">${formatRp(d.omzet)}</td></tr>`).join('');
+  } else if(currentTab==='tahunan'){
+    tbody.innerHTML=data.map(d=>`<tr><td class="px-3 py-2">${d.tahun}</td><td class="px-3 py-2">${d.jumlah_pesanan}</td><td class="px-3 py-2 font-semibold text-primary">${formatRp(d.omzet)}</td></tr>`).join('');
+  } else if(currentTab==='produk'){
+    tbody.innerHTML=data.map(d=>`<tr><td class="px-3 py-2">${d.nama}</td><td class="px-3 py-2">${d.kategori}</td><td class="px-3 py-2">${d.total_qty}</td><td class="px-3 py-2 font-semibold">${formatRp(d.total_omzet)}</td></tr>`).join('');
+  } else if(currentTab==='pesanan'){
+    tbody.innerHTML=data.map(d=>`<tr><td class="px-3 py-2">#${d.id}</td><td class="px-3 py-2 text-xs">${d.tanggal}</td><td class="px-3 py-2">${d.pelanggan_nama}</td><td class="px-3 py-2">${d.hp||'-'}</td><td class="px-3 py-2 font-semibold">${formatRp(d.total)}</td><td class="px-3 py-2"><span class="bg-pink-100 text-primary px-2 py-0.5 rounded-full text-xs">${d.status}</span></td><td class="px-3 py-2 text-xs">${d.items.map(i=>`${i.produk_nama} x${i.qty}`).join('<br>')}</td></tr>`).join('');
+  }
+}
+function exportCSV(){
+  const rows=[...document.querySelectorAll('#tabelLaporan tr')].map(tr=>[...tr.cells].map(td=>`"${td.innerText.replace(/"/g,'""')}"`).join(',')).join('\n');
+  const blob=new Blob([rows],{type:'text/csv'});
+  const a=document.createElement('a'); a.href=URL.createObjectURL(blob); a.download=`laporan-${currentTab}.csv`; a.click();
+}
+function cetakPDF(){
+  const { jsPDF } = window.jspdf;
+  const doc = new jsPDF();
+  // Kop
+  doc.setFillColor(91,26,58); doc.rect(0,0,210,28,'F');
+  doc.setTextColor(255,255,255); doc.setFontSize(16); doc.setFont('helvetica','bold');
+  doc.text('TYSA DESSERT', 14, 14);
+  doc.setFontSize(9); doc.setFont('helvetica','normal');
+  doc.text('Salad Buah Premium • Laporan ' + currentTab.toUpperCase(), 14, 20);
+  doc.setFontSize(8); doc.text('Dicetak: ' + new Date().toLocaleString('id-ID'), 14, 25);
+  // Judul tabel
+  doc.setTextColor(40,40,40); doc.setFontSize(12); doc.setFont('helvetica','bold');
+  const titleMap={harian:'Laporan Harian', bulanan:'Laporan Bulanan', tahunan:'Laporan Tahunan', produk:'Produk Terlaris', pesanan:'Daftar Pesanan'};
+  doc.text(titleMap[currentTab] || 'Laporan', 14, 38);
+  // Data untuk autotable
+  let head=[lastThead];
+  let body=[];
+  if(currentTab==='harian') body=lastData.map(d=>[d.tanggal, d.jumlah_pesanan, formatRp(d.omzet)]);
+  else if(currentTab==='bulanan') body=lastData.map(d=>[d.bulan, d.jumlah_pesanan, formatRp(d.omzet)]);
+  else if(currentTab==='tahunan') body=lastData.map(d=>[d.tahun, d.jumlah_pesanan, formatRp(d.omzet)]);
+  else if(currentTab==='produk') body=lastData.map(d=>[d.nama, d.kategori, d.total_qty, formatRp(d.total_omzet)]);
+  else if(currentTab==='pesanan') body=lastData.map(d=>[`#${d.id}`, d.tanggal, d.pelanggan_nama, d.hp||'-', formatRp(d.total), d.status, d.items.map(i=>`${i.produk_nama} x${i.qty}`).join(', ')]);
+  if(body.length===0) body=[['Tidak ada data']];
+  doc.autoTable({ startY: 42, head: head, body: body, theme:'striped', headStyles:{fillColor:[232,67,122]}, styles:{fontSize:8}, margin:{left:14,right:14} });
+  // Footer
+  const finalY = doc.lastAutoTable.finalY + 8;
+  doc.setFontSize(8); doc.setTextColor(100,100,100);
+  doc.text('Total data: ' + lastData.length + ' baris • tysa.dessert • segokolet', 14, finalY);
+  doc.save(`laporan-tysa-${currentTab}-${new Date().toISOString().slice(0,10)}.pdf`);
+}
+
+ensureLogin();
+</script>
+</body>
+</html>

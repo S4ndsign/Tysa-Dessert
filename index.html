@@ -1,0 +1,185 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Tysa Dessert - Salad Buah & Dessert Premium Pasuruan</title>
+<script src="https://cdn.tailwindcss.com"></script>
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&family=Playfair+Display:wght@700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+<script>
+tailwind.config = {
+  theme: {
+    extend: {
+      fontFamily: { poppins: ['Poppins','sans-serif'], display: ['Playfair Display','serif'] },
+      colors: { primary: '#E8437A', secondary: '#5B1A3A', cream: '#FFF5F8', softpink: '#FFE5EE' }
+    }
+  }
+}
+</script>
+<style>html{scroll-behavior:smooth} body{font-family:'Poppins',sans-serif}</style>
+</head>
+<body class="bg-cream text-gray-800">
+
+<!-- NAVBAR -->
+<nav class="fixed top-0 w-full bg-white/95 backdrop-blur shadow-sm z-50">
+  <div class="max-w-6xl mx-auto px-4 py-3 flex justify-between items-center">
+    <a href="#home" class="flex items-center gap-2 font-bold text-xl">
+      <span class="w-9 h-9 bg-primary rounded-xl flex items-center justify-center text-white"><i class="fa-solid fa-ice-cream"></i></span>
+      <span class="font-display text-secondary">Tysa Dessert</span>
+
+    </a>
+    <div class="hidden md:flex gap-7 text-sm font-medium">
+      <a href="#home" class="hover:text-primary">Beranda</a>
+      <a href="#produk" class="hover:text-primary">Menu</a>
+      <a href="#tentang" class="hover:text-primary">Tentang</a>
+      <a href="#testimoni" class="hover:text-primary">Testimoni</a>
+      <a href="#kontak" class="hover:text-primary">Kontak</a>
+    </div>
+    <div class="hidden md:flex items-center gap-2">
+      <a href="https://www.instagram.com/tysa.dessert/" target="_blank" class="w-9 h-9 border rounded-full flex items-center justify-center hover:bg-softpink"><i class="fa-brands fa-instagram text-primary"></i></a>
+      <a href="#produk" class="bg-primary text-white px-5 py-2 rounded-full text-sm font-semibold hover:bg-pink-600">Pesan Sekarang</a>
+    </div>
+    <button id="btnMenu" class="md:hidden text-2xl"><i class="fa-solid fa-bars"></i></button>
+  </div>
+  <div id="mobileNav" class="hidden md:hidden bg-white border-t px-4 py-3 space-y-3 text-sm">
+    <a href="#home" class="block">Beranda</a><a href="#produk" class="block">Menu</a><a href="#tentang" class="block">Tentang</a><a href="#kontak" class="block">Kontak</a>
+    <a href="https://www.instagram.com/tysa.dessert/" target="_blank" class="block text-primary font-semibold"><i class="fa-brands fa-instagram mr-1"></i> @tysa.dessert</a>
+    <a href="https://www.instagram.com/segokolet/" target="_blank" class="block text-primary font-semibold"><i class="fa-brands fa-instagram mr-1"></i> @segokolet</a>
+    <a href="https://wa.me/6281234567890?text=Halo%20Tysa%20Dessert%2C%20saya%20mau%20pesan" target="_blank" class="block bg-primary text-white text-center py-2 rounded-full font-semibold">Chat WhatsApp</a>
+  </div>
+</nav>
+
+<!-- HERO -->
+<section id="home" class="pt-28 pb-12 max-w-6xl mx-auto px-4">
+  <div class="grid md:grid-cols-2 gap-10 items-center">
+    <div>
+      <span class="inline-block bg-softpink text-primary text-xs font-bold px-3 py-1 rounded-full mb-3"><i class="fa-solid fa-sparkles mr-1"></i> Fresh • Creamy • Tanpa Pengawet</span>
+      <h1 class="font-display text-4xl md:text-5xl font-bold leading-tight text-secondary">Salad Buah Premium, <span class="text-primary">Segarnya Bikin Nagih!</span></h1>
+      <p class="mt-4 text-gray-600 leading-relaxed text-sm">Dari <b>Tysa Dessert</b> & <b>Segokolet</b> — spesialis Salad Buah, Asinan, Puding, Sop Buah, Kimbab & Nasi Kulit. Buah segar pilihan, creamy lumer, bikin ngemil jadi sehat. Mulai <b>Rp 12.000</b> saja!</p>
+      <div class="flex gap-3 mt-6 flex-wrap">
+        <a href="https://wa.me/6281234567890?text=Halo%20Tysa%20Dessert%2C%20saya%20mau%20pesan" target="_blank" class="bg-primary text-white px-6 py-3 rounded-full font-semibold hover:bg-pink-600 flex items-center gap-2"><i class="fa-brands fa-whatsapp text-xl"></i> Pesan via WhatsApp</a>
+        <a href="#produk" class="border-2 border-secondary text-secondary px-6 py-3 rounded-full font-semibold hover:bg-secondary hover:text-white">Lihat Menu</a>
+      </div>
+      <div class="flex gap-2 mt-4">
+        <a href="https://www.instagram.com/tysa.dessert/" target="_blank" class="text-sm bg-white border px-4 py-2 rounded-full hover:bg-softpink"><i class="fa-brands fa-instagram text-primary mr-1"></i> @tysa.dessert</a>
+        <a href="https://www.instagram.com/segokolet/" target="_blank" class="text-sm bg-white border px-4 py-2 rounded-full hover:bg-softpink"><i class="fa-brands fa-instagram text-primary mr-1"></i> @segokolet</a>
+      </div>
+      <div class="flex gap-6 mt-7 text-center">
+        <div><p class="text-2xl font-bold text-secondary">1000+</p><p class="text-xs text-gray-500">Cup Terjual</p></div>
+        <div class="w-px bg-gray-300"></div>
+        <div><p class="text-2xl font-bold text-secondary">4.9 <i class="fa-solid fa-star text-yellow-400 text-sm"></i></p><p class="text-xs text-gray-500">Rating Pelanggan</p></div>
+        <div class="w-px bg-gray-300"></div>
+        <div><p class="text-2xl font-bold text-secondary">Fresh</p><p class="text-xs text-gray-500">Buat Harian</p></div>
+      </div>
+    </div>
+    <div class="relative">
+      <img src="https://images.unsplash.com/photo-1565958011703-44f9829ba187?w=700&auto=format&fit=crop&q=60" class="rounded-3xl shadow-xl w-full h-[430px] object-cover" alt="Salad Buah Tysa Dessert">
+      <div class="absolute -bottom-5 -left-4 bg-white p-4 rounded-2xl shadow-lg flex items-center gap-3 max-w-[260px]">
+        <img src="https://images.unsplash.com/photo-1543528171-82ad35286012?w=100&auto=format&fit=crop&q=60" class="w-14 h-14 rounded-xl object-cover">
+        <div><p class="font-bold text-sm">Salad Buah Best Seller</p><p class="text-xs text-gray-500">250ml & 500ml • Creamy</p><p class="text-primary font-bold text-sm">Mulai Rp 15.000</p></div>
+      </div>
+      <div class="absolute -top-3 -right-3 bg-secondary text-white px-4 py-2 rounded-full text-sm font-bold shadow-lg">Buka Setiap Hari 08.00 - 21.00</div>
+    </div>
+  </div>
+</section>
+
+<!-- KEUNGGULAN -->
+<section class="bg-white py-10">
+  <div class="max-w-6xl mx-auto px-4 grid grid-cols-2 md:grid-cols-4 gap-6 text-center">
+    <div class="p-4"><div class="w-12 h-12 bg-softpink rounded-xl flex items-center justify-center mx-auto text-primary text-xl"><i class="fa-solid fa-apple-whole"></i></div><h3 class="font-semibold mt-3 text-sm">Buah Fresh Harian</h3><p class="text-xs text-gray-500 mt-1">Potong tiap pagi, tidak menginap</p></div>
+    <div class="p-4"><div class="w-12 h-12 bg-pink-50 rounded-xl flex items-center justify-center mx-auto text-primary text-xl"><i class="fa-solid fa-jar"></i></div><h3 class="font-semibold mt-3 text-sm">Creamy Premium</h3><p class="text-xs text-gray-500 mt-1">Mayo & keju lumer racikan Tysa</p></div>
+    <div class="p-4"><div class="w-12 h-12 bg-softpink rounded-xl flex items-center justify-center mx-auto text-primary text-xl"><i class="fa-solid fa-motorcycle"></i></div><h3 class="font-semibold mt-3 text-sm">Antar Cepat</h3><p class="text-xs text-gray-500 mt-1">GrabExpress / Paxel / Kurir</p></div>
+    <div class="p-4"><div class="w-12 h-12 bg-pink-50 rounded-xl flex items-center justify-center mx-auto text-primary text-xl"><i class="fa-solid fa-tags"></i></div><h3 class="font-semibold mt-3 text-sm">Bisa Hampers</h3><p class="text-xs text-gray-500 mt-1">Cocok untuk hantaran & arisan</p></div>
+  </div>
+</section>
+
+<!-- PRODUK -->
+<section id="produk" class="py-14 max-w-6xl mx-auto px-4">
+  <div class="text-center mb-8">
+    <span class="text-primary font-bold text-sm tracking-widest">MENU TYSA DESSERT x SEGOKOLET</span>
+    <h2 class="font-display text-3xl font-bold text-secondary mt-1">7 Menu Favorit Pelanggan</h2>
+    <p class="text-gray-500 text-sm mt-2">Klik <b>Tambah</b> untuk masuk keranjang, lalu Checkout via WhatsApp • <span class="text-primary font-semibold">Gambar bisa diganti foto asli IG</span></p>
+  </div>
+
+  <div class="flex gap-2 justify-center flex-wrap mb-6" id="filterBtns">
+    <button data-filter="all" class="filter-active bg-secondary text-white px-4 py-2 rounded-full text-sm">Semua</button>
+    <button data-filter="salad" class="bg-white border px-4 py-2 rounded-full text-sm hover:bg-gray-50">Salad</button>
+    <button data-filter="segar" class="bg-white border px-4 py-2 rounded-full text-sm hover:bg-gray-50">Dessert Segar</button>
+    <button data-filter="nasi" class="bg-white border px-4 py-2 rounded-full text-sm hover:bg-gray-50">Nasi & Kimbab</button>
+  </div>
+
+  <div id="productGrid" class="grid sm:grid-cols-2 lg:grid-cols-3 gap-6"></div>
+
+  <p class="text-center text-xs text-gray-400 mt-6"><i class="fa-solid fa-circle-info mr-1"></i> Catatan: Foto produk saat ini pakai placeholder Unsplash. Ganti URL gambar di <code>script.js</code> dengan link foto dari Instagram @tysa.dessert / @segokolet agar 100% asli.</p>
+
+  <!-- KERANJANG -->
+  <div id="cartBox" class="fixed bottom-4 left-1/2 -translate-x-1/2 bg-secondary text-white px-5 py-3 rounded-full shadow-2xl hidden items-center gap-4 z-40">
+    <span class="text-sm"><span id="cartCount">0</span> item • <span id="cartTotal">Rp 0</span></span>
+    <button onclick="checkoutWA()" class="bg-primary px-5 py-2 rounded-full text-sm font-bold hover:bg-pink-600">Checkout WA <i class="fa-brands fa-whatsapp ml-1"></i></button>
+  </div>
+</section>
+
+<!-- TENTANG -->
+<section id="tentang" class="bg-white py-14">
+  <div class="max-w-6xl mx-auto px-4 grid md:grid-cols-2 gap-10 items-center">
+    <img src="https://images.unsplash.com/photo-1488477181946-64290103bb53?w=700&auto=format&fit=crop&q=60" class="rounded-3xl h-[380px] w-full object-cover shadow-lg" alt="Tysa Dessert">
+    <div>
+      <span class="text-primary font-bold text-sm tracking-widest">TENTANG TYSA DESSERT</span>
+      <h2 class="font-display text-3xl font-bold text-secondary mt-2">Manis, Segar, Bikin Ketagihan</h2>
+      <p class="text-gray-600 mt-4 leading-relaxed text-sm">Tysa Dessert dirintis dengan cinta untuk pecinta dessert sehat. Kami pakai buah segar grade A, creamy yang tidak eneg, dan porsi yang pas di lidah & di kantong. Kolaborasi dengan <b>Segokolet</b> menghadirkan Nasi Kulit & Kimbab gurih untuk menemani manisnya dessert.</p>
+      <ul class="mt-4 space-y-2 text-sm">
+        <li><i class="fa-solid fa-check text-primary mr-2"></i> Pre-order H-1 untuk hampers & acara (min 20 cup)</li>
+        <li><i class="fa-solid fa-check text-primary mr-2"></i> Varian: original, keju lumer, chocolate, matcha</li>
+        <li><i class="fa-solid fa-check text-primary mr-2"></i> Pembayaran COD, Transfer, QRIS & ShopeeFood</li>
+      </ul>
+      <div class="flex gap-3 mt-6 flex-wrap">
+        <a href="https://www.instagram.com/tysa.dessert/" target="_blank" class="bg-softpink text-primary px-4 py-2 rounded-full text-sm font-semibold"><i class="fa-brands fa-instagram mr-1"></i> @tysa.dessert</a>
+        <a href="https://www.instagram.com/segokolet/" target="_blank" class="bg-softpink text-primary px-4 py-2 rounded-full text-sm font-semibold"><i class="fa-brands fa-instagram mr-1"></i> @segokolet</a>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- TESTIMONI -->
+<section id="testimoni" class="py-14 max-w-6xl mx-auto px-4">
+  <h2 class="font-display text-3xl font-bold text-center text-secondary">Kata Pelanggan Tysa</h2>
+  <div class="grid md:grid-cols-3 gap-6 mt-8">
+    <div class="bg-white p-6 rounded-2xl shadow-sm"><div class="text-yellow-400 text-sm">★★★★★</div><p class="text-sm mt-2 text-gray-600">"Salad buahnya creamy tapi nggak eneg, buahnya banyak dan segar! Langganan tiap minggu."</p><p class="font-semibold text-sm mt-3">— Kak Dinda, Pelanggan Tysa</p></div>
+    <div class="bg-white p-6 rounded-2xl shadow-sm"><div class="text-yellow-400 text-sm">★★★★★</div><p class="text-sm mt-2 text-gray-600">"Asinan buahnya pedas segar, pas banget siang-siang. Pudingnya lembut lumer!"</p><p class="font-semibold text-sm mt-3">— Bu Sinta, Repeat Order 3x</p></div>
+    <div class="bg-white p-6 rounded-2xl shadow-sm"><div class="text-yellow-400 text-sm">★★★★★</div><p class="text-sm mt-2 text-gray-600">"Nasi Kulit Segokolet gurihnya juara, porsi ngenyangin. Combo sama sop buah mantul!"</p><p class="font-semibold text-sm mt-3">— Mas Andi, GrabFood</p></div>
+  </div>
+</section>
+
+<!-- KONTAK -->
+<section id="kontak" class="bg-secondary text-white py-12">
+  <div class="max-w-6xl mx-auto px-4 grid md:grid-cols-2 gap-10">
+    <div>
+      <h2 class="font-display text-3xl font-bold">Pesan Hari Ini,<br>Dikirim Hari Ini!</h2>
+      <p class="text-pink-200 mt-3 text-sm">Jam operasional 08.00 - 21.00 WIB. Chat WA dibalas cepat.</p>
+      <div class="mt-6 space-y-3 text-sm">
+        <p><i class="fa-brands fa-whatsapp mr-2"></i> WA Tysa Dessert: 0812-3456-7890</p>
+        <p><i class="fa-brands fa-instagram mr-2"></i> IG: @tysa.dessert & @segokolet</p>
+        <p><i class="fa-solid fa-location-dot mr-2"></i> Pasuruan • Siap kirim via Grab/Gojek</p>
+        <p><i class="fa-solid fa-store mr-2"></i> Tersedia di GoFood / ShopeeFood / GrabFood</p>
+      </div>
+      <a href="https://wa.me/6281234567890?text=Halo%20Tysa%20Dessert%2C%20saya%20mau%20tanya%20menu" target="_blank" class="inline-block mt-6 bg-white text-secondary px-6 py-3 rounded-full font-bold hover:bg-gray-100"><i class="fa-brands fa-whatsapp mr-2"></i> Chat WhatsApp</a>
+    </div>
+    <form onsubmit="kirimPesan(event)" class="bg-white text-gray-800 p-6 rounded-2xl shadow-xl">
+      <h3 class="font-bold text-lg">Form Pesan Cepat</h3>
+      <p class="text-xs text-gray-500 mb-4">Isi form, otomatis terhubung ke WhatsApp Tysa</p>
+      <input id="nama" required placeholder="Nama Anda" class="w-full border rounded-lg px-3 py-2 text-sm mb-3">
+      <input id="hp" placeholder="No. HP (opsional)" class="w-full border rounded-lg px-3 py-2 text-sm mb-3">
+      <textarea id="pesan" required placeholder="Mau pesan apa? Contoh: 2 Salad Buah 500ml + 1 Kimbab" class="w-full border rounded-lg px-3 py-2 text-sm h-24 mb-3"></textarea>
+      <button type="submit" class="w-full bg-primary text-white py-3 rounded-full font-bold hover:bg-pink-600">Kirim ke WhatsApp</button>
+    </form>
+  </div>
+</section>
+
+<footer class="bg-[#3A1026] text-pink-200 text-center py-6 text-xs">
+  © 2026 Tysa Dessert x Segokolet • Salad Buah & Dessert Premium Pasuruan • <span class="opacity-70">Follow <a href="https://www.instagram.com/tysa.dessert/" target="_blank" class="underline">@tysa.dessert</a> & <a href="https://www.instagram.com/segokolet/" target="_blank" class="underline">@segokolet</a></span>
+</footer>
+
+<script src="script.js"></script>
+</body>
+</html>
