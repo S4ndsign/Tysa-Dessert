@@ -29,69 +29,15 @@ tokens = {}
 def get_db():
     return pymysql.connect(**DB_CONFIG)
 
-def init_db():
-    try:
-        conn = get_db()
-        with conn.cursor() as cur:
-            cur.execute("""
-            CREATE TABLE IF NOT EXISTS pelanggan (
-              id INT AUTO_INCREMENT PRIMARY KEY,
-              nama VARCHAR(100) NOT NULL,
-              hp VARCHAR(20),
-              alamat TEXT,
-              created_at DATETIME DEFAULT CURRENT_TIMESTAMP
-            )""")
-            cur.execute("""
-            CREATE TABLE IF NOT EXISTS produk (
-              id INT PRIMARY KEY,
-              nama VARCHAR(100) NOT NULL,
-              harga INT NOT NULL,
-              kategori VARCHAR(20) NOT NULL,
-              aktif TINYINT DEFAULT 1
-            )""")
-            cur.execute("""
-            CREATE TABLE IF NOT EXISTS pesanan (
-              id INT AUTO_INCREMENT PRIMARY KEY,
-              pelanggan_id INT NOT NULL,
-              tanggal DATETIME DEFAULT CURRENT_TIMESTAMP,
-              total INT NOT NULL DEFAULT 0,
-              status VARCHAR(20) NOT NULL DEFAULT 'pending',
-              metode_bayar VARCHAR(20) DEFAULT 'COD',
-              catatan TEXT,
-              created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
-              FOREIGN KEY (pelanggan_id) REFERENCES pelanggan(id)
-            )""")
-            cur.execute("""
-            CREATE TABLE IF NOT EXISTS pesanan_item (
-              id INT AUTO_INCREMENT PRIMARY KEY,
-              pesanan_id INT NOT NULL,
-              produk_id INT NOT NULL,
-              qty INT NOT NULL,
-              harga_satuan INT NOT NULL,
-              subtotal INT NOT NULL,
-              FOREIGN KEY (pesanan_id) REFERENCES pesanan(id) ON DELETE CASCADE,
-              FOREIGN KEY (produk_id) REFERENCES produk(id)
-            )""")
-            # seed produk jika kosong
-            cur.execute("SELECT COUNT(*) as c FROM produk")
-            if cur.fetchone()["c"] == 0:
-                cur.execute("INSERT INTO produk (id, nama, harga, kategori) VALUES (1,'Salad Buah Premium',25000,'salad'),(2,'Salad Sayur (Veggie Salad)',22000,'salad'),(3,'Asinan Buah Segar',20000,'segar'),(4,'Puding Tysa Lumer',15000,'segar'),(5,'Sop Buah Tropical',18000,'segar'),(6,'Kimbab Segokolet',20000,'nasi'),(7,'Nasi Kulit Segokolet',15000,'nasi')")
-            conn.commit()
-        conn.close()
-        print("DB init OK")
-    except Exception as e:
-        print("DB init gagal:", e)
-
-# JANGAN auto init saat import (bisa bikin gunicorn timeout di Railway jika MySQL belum ready)
-# init akan dipanggil lazy saat /health atau /api/produk pertama kali
-_inited = False
-def ensure_init():
-    global _inited
-    if not _inited:
-        try:
-            init_db()
-        except: pass
-        _inited = True
+HARDCODED_PRODUK = [
+    {"id":1,"nama":"Salad Buah Premium","harga":25000,"kategori":"salad","aktif":1},
+    {"id":2,"nama":"Salad Sayur (Veggie Salad)","harga":22000,"kategori":"salad","aktif":1},
+    {"id":3,"nama":"Asinan Buah Segar","harga":20000,"kategori":"segar","aktif":1},
+    {"id":4,"nama":"Puding Tysa Lumer","harga":15000,"kategori":"segar","aktif":1},
+    {"id":5,"nama":"Sop Buah Tropical","harga":18000,"kategori":"segar","aktif":1},
+    {"id":6,"nama":"Kimbab Segokolet","harga":20000,"kategori":"nasi","aktif":1},
+    {"id":7,"nama":"Nasi Kulit Segokolet","harga":15000,"kategori":"nasi","aktif":1},
+]
 
 def require_auth(f):
     @wraps(f)
@@ -133,7 +79,6 @@ def health():
 
 @app.route("/api/produk")
 def api_produk():
-    ensure_init()
     try:
         conn = get_db()
         with conn.cursor() as cur:
@@ -142,7 +87,9 @@ def api_produk():
         conn.close()
         return jsonify(rows)
     except Exception as e:
-        return jsonify({"error": str(e), "hint": "cek DB_HOST/DB_PASS di Railway Variables"}), 500
+        # fallback hardcoded biar landing tetap tampil walau DB down
+        print("DB error di /api/produk:", e)
+        return jsonify(HARDCODED_PRODUK)
 
 @app.route("/api/pesanan", methods=["GET", "POST"])
 def api_pesanan():
