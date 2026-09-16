@@ -29,6 +29,57 @@ tokens = {}
 def get_db():
     return pymysql.connect(**DB_CONFIG)
 
+def ensure_tables():
+    conn = get_db()
+    with conn.cursor() as cur:
+        cur.execute("""CREATE TABLE IF NOT EXISTS pelanggan (
+          id INT AUTO_INCREMENT PRIMARY KEY,
+          nama VARCHAR(100) NOT NULL,
+          hp VARCHAR(20),
+          alamat TEXT,
+          created_at DATETIME DEFAULT CURRENT_TIMESTAMP
+        )""")
+        cur.execute("""CREATE TABLE IF NOT EXISTS produk (
+          id INT PRIMARY KEY,
+          nama VARCHAR(100) NOT NULL,
+          harga INT NOT NULL,
+          kategori VARCHAR(20) NOT NULL,
+          aktif TINYINT DEFAULT 1
+        )""")
+        cur.execute("""CREATE TABLE IF NOT EXISTS pesanan (
+          id INT AUTO_INCREMENT PRIMARY KEY,
+          pelanggan_id INT NOT NULL,
+          tanggal DATETIME DEFAULT CURRENT_TIMESTAMP,
+          total INT NOT NULL DEFAULT 0,
+          status VARCHAR(20) NOT NULL DEFAULT 'pending',
+          metode_bayar VARCHAR(20) DEFAULT 'COD',
+          catatan TEXT,
+          created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+          FOREIGN KEY (pelanggan_id) REFERENCES pelanggan(id)
+        )""")
+        cur.execute("""CREATE TABLE IF NOT EXISTS pesanan_item (
+          id INT AUTO_INCREMENT PRIMARY KEY,
+          pesanan_id INT NOT NULL,
+          produk_id INT NOT NULL,
+          qty INT NOT NULL,
+          harga_satuan INT NOT NULL,
+          subtotal INT NOT NULL,
+          FOREIGN KEY (pesanan_id) REFERENCES pesanan(id) ON DELETE CASCADE,
+          FOREIGN KEY (produk_id) REFERENCES produk(id)
+        )""")
+        cur.execute("SELECT COUNT(*) AS c FROM produk")
+        if cur.fetchone()["c"] == 0:
+            cur.execute("""INSERT INTO produk (id, nama, harga, kategori) VALUES
+              (1,'Salad Buah Premium',25000,'salad'),
+              (2,'Salad Sayur (Veggie Salad)',22000,'salad'),
+              (3,'Asinan Buah Segar',20000,'segar'),
+              (4,'Puding Tysa Lumer',15000,'segar'),
+              (5,'Sop Buah Tropical',18000,'segar'),
+              (6,'Kimbab Segokolet',20000,'nasi'),
+              (7,'Nasi Kulit Segokolet',15000,'nasi')""")
+    conn.commit()
+    conn.close()
+
 HARDCODED_PRODUK = [
     {"id":1,"nama":"Salad Buah Premium","harga":25000,"kategori":"salad","aktif":1},
     {"id":2,"nama":"Salad Sayur (Veggie Salad)","harga":22000,"kategori":"salad","aktif":1},
@@ -304,6 +355,11 @@ if __name__ == "__main__":
         c=get_db()
         c.close()
         print(f"MySQL OK: {DB_CONFIG['database']} @ {DB_CONFIG['host']}:{DB_CONFIG['port']}")
+        try:
+            ensure_tables()
+            print("TABLES OK")
+        except Exception as e:
+            print("TABLES GAGAL:", e)
     except Exception as e:
         print("MySQL GAGAL:", e)
     print(f"Login admin -> username: {ADMIN_USER} password: {ADMIN_PASS}")
