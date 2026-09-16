@@ -209,7 +209,7 @@ async function loadAll(){
   else if(currentTab==='bulanan'){ url=`/api/laporan/bulanan`; thead=['Bulan','Jumlah Pesanan','Omzet']; }
   else if(currentTab==='tahunan'){ url=`/api/laporan/tahunan`; thead=['Tahun','Jumlah Pesanan','Omzet']; }
   else if(currentTab==='produk'){ url=`/api/laporan/produk?from=${from}&to=${to}`; thead=['Produk','Kategori','Qty Terjual','Omzet']; }
-  else if(currentTab==='pesanan'){ url=`/api/pesanan`; thead=['ID','Tanggal','Pelanggan','HP','Total','Status','Items']; }
+  else if(currentTab==='pesanan'){ url=`/api/pesanan`; thead=['ID','Tanggal','Pelanggan','HP','Total','Status','Items','Aksi']; }
   lastThead=thead;
   const r=await fetch(url,{headers:authHeader()});
   if(r.status===401){ doLogout(); return; }
@@ -217,7 +217,7 @@ async function loadAll(){
   document.getElementById('theadRow').innerHTML = thead.map(h=>`<th class="text-left px-3 py-2">${h}</th>`).join('');
   const tbody=document.getElementById('tbodyRow');
   document.getElementById('printDate').textContent=new Date().toLocaleString('id-ID');
-  if(data.length===0){ tbody.innerHTML='<tr><td colspan="7" class="px-3 py-6 text-center text-gray-400">Belum ada data</td></tr>'; return; }
+  if(data.length===0){ tbody.innerHTML='<tr><td colspan="8" class="px-3 py-6 text-center text-gray-400">Belum ada data</td></tr>'; return; }
   if(currentTab==='harian'){
     tbody.innerHTML=data.map(d=>`<tr><td class="px-3 py-2">${d.tanggal}</td><td class="px-3 py-2">${d.jumlah_pesanan}</td><td class="px-3 py-2 font-semibold text-primary">${formatRp(d.omzet)}</td></tr>`).join('');
   } else if(currentTab==='bulanan'){
@@ -227,11 +227,19 @@ async function loadAll(){
   } else if(currentTab==='produk'){
     tbody.innerHTML=data.map(d=>`<tr><td class="px-3 py-2">${d.nama}</td><td class="px-3 py-2">${d.kategori}</td><td class="px-3 py-2">${d.total_qty}</td><td class="px-3 py-2 font-semibold">${formatRp(d.total_omzet)}</td></tr>`).join('');
   } else if(currentTab==='pesanan'){
-    tbody.innerHTML=data.map(d=>`<tr><td class="px-3 py-2">#${d.id}</td><td class="px-3 py-2 text-xs">${d.tanggal}</td><td class="px-3 py-2">${d.pelanggan_nama}</td><td class="px-3 py-2">${d.hp||'-'}</td><td class="px-3 py-2 font-semibold">${formatRp(d.total)}</td><td class="px-3 py-2"><span class="bg-pink-100 text-primary px-2 py-0.5 rounded-full text-xs">${d.status}</span></td><td class="px-3 py-2 text-xs">${d.items.map(i=>`${i.produk_nama} x${i.qty}`).join('<br>')}</td></tr>`).join('');
+    tbody.innerHTML=data.map(d=>`<tr><td class="px-3 py-2">#${d.id}</td><td class="px-3 py-2 text-xs">${d.tanggal}</td><td class="px-3 py-2">${d.pelanggan_nama}</td><td class="px-3 py-2">${d.hp||'-'}</td><td class="px-3 py-2 font-semibold">${formatRp(d.total)}</td><td class="px-3 py-2"><span class="bg-pink-100 text-primary px-2 py-0.5 rounded-full text-xs">${d.status}</span></td><td class="px-3 py-2 text-xs">${d.items.map(i=>`${i.produk_nama} x${i.qty}`).join('<br>')}</td><td class="px-3 py-2"><button onclick="hapusPesanan(${d.id})" class="bg-red-500 text-white px-3 py-1 rounded-full text-xs hover:bg-red-600"><i class="fa-solid fa-trash mr-1"></i>Hapus</button></td></tr>`).join('');
   }
 }
+async function hapusPesanan(id){
+  if(!confirm(`Hapus pesanan #${id}? Data yang dihapus tidak bisa dikembalikan.`)) return;
+  const r=await fetch(`/api/pesanan/${id}`,{method:'DELETE', headers:authHeader()});
+  if(r.status===401){ doLogout(); return; }
+  const j=await r.json();
+  if(j.ok){ alert(`Pesanan #${id} terhapus`); loadAll(); }
+  else alert('Gagal hapus: '+(j.error||'unknown'));
+}
 function exportCSV(){
-  const rows=[...document.querySelectorAll('#tabelLaporan tr')].map(tr=>[...tr.cells].map(td=>`"${td.innerText.replace(/"/g,'""')}"`).join(',')).join('\n');
+  const rows=[...document.querySelectorAll('#tabelLaporan tr')].map(tr=>{let cells=[...tr.cells]; if(currentTab==='pesanan') cells=cells.slice(0,-1); return cells.map(td=>`"${td.innerText.replace(/"/g,'""')}"`).join(',')}).join('\n');
   const blob=new Blob([rows],{type:'text/csv'});
   const a=document.createElement('a'); a.href=URL.createObjectURL(blob); a.download=`laporan-${currentTab}.csv`; a.click();
 }
@@ -249,8 +257,8 @@ function cetakPDF(){
   doc.setTextColor(40,40,40); doc.setFontSize(12); doc.setFont('helvetica','bold');
   const titleMap={harian:'Laporan Harian', bulanan:'Laporan Bulanan', tahunan:'Laporan Tahunan', produk:'Produk Terlaris', pesanan:'Daftar Pesanan'};
   doc.text(titleMap[currentTab] || 'Laporan', 14, 38);
-  // Data untuk autotable
-  let head=[lastThead];
+  // Data untuk autotable (kolom Aksi tidak ikut ke PDF)
+  let head=[lastThead.filter(h=>h!=='Aksi')];
   let body=[];
   if(currentTab==='harian') body=lastData.map(d=>[d.tanggal, d.jumlah_pesanan, formatRp(d.omzet)]);
   else if(currentTab==='bulanan') body=lastData.map(d=>[d.bulan, d.jumlah_pesanan, formatRp(d.omzet)]);

@@ -235,6 +235,19 @@ def update_status(pid):
         conn.close()
     return jsonify({"ok":True})
 
+@app.route("/api/pesanan/<int:pid>", methods=["DELETE"])
+@require_auth
+def hapus_pesanan(pid):
+    conn=get_db()
+    try:
+        with conn.cursor() as cur:
+            cur.execute("DELETE FROM pesanan_item WHERE pesanan_id=%s", (pid,))
+            cur.execute("DELETE FROM pesanan WHERE id=%s", (pid,))
+        conn.commit()
+    finally:
+        conn.close()
+    return jsonify({"ok":True})
+
 @app.route("/api/laporan/harian")
 @require_auth
 def lap_harian():
