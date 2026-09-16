@@ -1,4 +1,4 @@
-const WA_NUMBER = "6281234567890";
+const WA_NUMBER = "6282233262629";
 
 // GANTI URL gambar di bawah dengan link foto asli dari Instagram @tysa.dessert / @segokolet
 // Cara: buka IG di browser > klik foto > klik kanan Copy image address > paste di field img
