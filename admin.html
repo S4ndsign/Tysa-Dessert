@@ -227,7 +227,7 @@ async function loadAll(){
   } else if(currentTab==='produk'){
     tbody.innerHTML=data.map(d=>`<tr><td class="px-3 py-2">${d.nama}</td><td class="px-3 py-2">${d.kategori}</td><td class="px-3 py-2">${d.total_qty}</td><td class="px-3 py-2 font-semibold">${formatRp(d.total_omzet)}</td></tr>`).join('');
   } else if(currentTab==='pesanan'){
-    tbody.innerHTML=data.map(d=>`<tr><td class="px-3 py-2">#${d.id}</td><td class="px-3 py-2 text-xs">${d.tanggal}</td><td class="px-3 py-2">${d.pelanggan_nama}</td><td class="px-3 py-2">${d.hp||'-'}</td><td class="px-3 py-2 font-semibold">${formatRp(d.total)}</td><td class="px-3 py-2"><span class="bg-pink-100 text-primary px-2 py-0.5 rounded-full text-xs">${d.status}</span></td><td class="px-3 py-2 text-xs">${d.items.map(i=>`${i.produk_nama} x${i.qty}`).join('<br>')}</td><td class="px-3 py-2"><button onclick="hapusPesanan(${d.id})" class="bg-red-500 text-white px-3 py-1 rounded-full text-xs hover:bg-red-600"><i class="fa-solid fa-trash mr-1"></i>Hapus</button></td></tr>`).join('');
+    tbody.innerHTML=data.map(d=>`<tr><td class="px-3 py-2">#${d.id}</td><td class="px-3 py-2 text-xs">${d.tanggal}</td><td class="px-3 py-2">${d.pelanggan_nama}</td><td class="px-3 py-2">${d.hp||'-'}</td><td class="px-3 py-2 font-semibold">${formatRp(d.total)}</td><td class="px-3 py-2"><select onchange="ubahStatus(${d.id}, this.value)" class="bg-pink-100 text-primary px-2 py-1 rounded-full text-xs font-semibold cursor-pointer">${['pending','lunas','dikirim','selesai','batal'].map(s=>`<option value="${s}" ${s===d.status?'selected':''}>${s}</option>`).join('')}</select></td><td class="px-3 py-2 text-xs">${d.items.map(i=>`${i.produk_nama} x${i.qty}`).join('<br>')}</td><td class="px-3 py-2"><button onclick="hapusPesanan(${d.id})" class="bg-red-500 text-white px-3 py-1 rounded-full text-xs hover:bg-red-600"><i class="fa-solid fa-trash mr-1"></i>Hapus</button></td></tr>`).join('');
   }
 }
 async function hapusPesanan(id){
@@ -237,6 +237,13 @@ async function hapusPesanan(id){
   const j=await r.json();
   if(j.ok){ alert(`Pesanan #${id} terhapus`); loadAll(); }
   else alert('Gagal hapus: '+(j.error||'unknown'));
+}
+async function ubahStatus(id, status){
+  const r=await fetch(`/api/pesanan/${id}/status`,{method:'PUT', headers:{...authHeader(),'Content-Type':'application/json'}, body:JSON.stringify({status})});
+  if(r.status===401){ doLogout(); return; }
+  const j=await r.json();
+  if(j.ok) loadAll();
+  else alert('Gagal ubah status: '+(j.error||'unknown'));
 }
 function exportCSV(){
   const rows=[...document.querySelectorAll('#tabelLaporan tr')].map(tr=>{let cells=[...tr.cells]; if(currentTab==='pesanan') cells=cells.slice(0,-1); return cells.map(td=>`"${td.innerText.replace(/"/g,'""')}"`).join(',')}).join('\n');
